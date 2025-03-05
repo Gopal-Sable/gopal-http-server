@@ -6,8 +6,6 @@ const { json } = require("stream/consumers");
 const port = 3000;
 
 const server = http.createServer((req, res) => {
-  //   let statusRegx = /^\/status\/(\d+)$/;
-  //   let delayRegx = /^\/delay\/(\d+)$/;
   let [_, path, param] = req.url.split("/");
   if (req.method !== "GET") {
     res.writeHead(405, { "Content-Type": "application/json" });
@@ -117,9 +115,8 @@ function delayRequest(res, delay) {
 
       res.end(`${delay}`);
     }, delay * 1000);
-  }
-  else{
+  } else {
     res.writeHead(200);
-    res.end(JSON.stringify({"Error":"Invalid delay"}));
+    res.end(JSON.stringify({ Error: "Invalid delay" }));
   }
 }
