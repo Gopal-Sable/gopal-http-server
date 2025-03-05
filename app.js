@@ -1,36 +1,39 @@
 const http = require("http");
 const fs = require("fs/promises");
 const { v4: uuidv4 } = require("uuid");
+const { json } = require("stream/consumers");
 
 const port = 3000;
 
 const server = http.createServer((req, res) => {
-  let statusRegx = /^\/status\/(\d+)$/;
-  let delayRegx = /^\/delay\/(\d+)$/;
+  //   let statusRegx = /^\/status\/(\d+)$/;
+  //   let delayRegx = /^\/delay\/(\d+)$/;
+  let [_, path, param] = req.url.split("/");
   if (req.method !== "GET") {
     res.writeHead(405, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Method Not Allowed" }));
     return;
   }
-  switch (true) {
-    case req.url === "/html":
+  switch (path) {
+    case "html":
       getHtml(res);
       break;
-    case req.url === "/json":
+    case "json":
       getJson(res);
       break;
 
-    case req.url === "/uuid":
+    case "uuid":
       getUuid(res);
       break;
 
-    case statusRegx.test(req.url):
-      printStatus(res, req.url);
+    case "status":
+      printStatus(res, param);
       break;
 
-    case delayRegx.test(req.url):
-      delayRequest(res, req.url);
+    case "delay":
+      delayRequest(res, param);
       break;
+
     default:
       res.writeHead(404, { "Content-Type": "text/html" });
       res.write("<h1>Page not found</h1>");
@@ -96,9 +99,9 @@ function getUuid(res) {
   res.end();
 }
 
-function printStatus(res, url) {
-  let status = url.split("/")[2];
-  if (status >= 100 && status <= 599) {
+function printStatus(res, status) {
+  let isStatus = !isNaN(status) && status >= 100 && status <= 599;
+  if (isStatus) {
     res.writeHead(status);
   } else {
     res.writeHead(500);
@@ -107,11 +110,16 @@ function printStatus(res, url) {
   res.end(status);
 }
 
-function delayRequest(res, url) {
-  let delay = url.split("/")[2] * 1000;
-  setTimeout(() => {
-    res.writeHead(200);
+function delayRequest(res, delay) {
+  if (!isNaN(delay)) {
+    setTimeout(() => {
+      res.writeHead(200);
 
-    res.end(`${delay}`);
-  }, delay);
+      res.end(`${delay}`);
+    }, delay * 1000);
+  }
+  else{
+    res.writeHead(200);
+    res.end(JSON.stringify({"Error":"Invalid delay"}));
+  }
 }
