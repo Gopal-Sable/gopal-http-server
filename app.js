@@ -99,9 +99,9 @@ function getUuid(res) {
 function printStatus(res, status) {
   let isStatus = !isNaN(status) && status >= 100 && status <= 599;
   if (isStatus) {
-    res.writeHead(status);
+    res.writeHead(status, { "Content-Type": "text/plain" });
   } else {
-    res.writeHead(500);
+    res.writeHead(500, { "Content-Type": "text/plain" });
     res.write("Invalid status code: ");
   }
   res.end(status);
@@ -110,12 +110,12 @@ function printStatus(res, status) {
 function delayRequest(res, delay) {
   if (!isNaN(delay)) {
     setTimeout(() => {
-      res.writeHead(200);
+      res.writeHead(200, { "Content-Type": "text/plain" });
 
       res.end(`${delay}`);
     }, delay * 1000);
   } else {
-    res.writeHead(200);
+    res.writeHead(200, { "Content-Type": "text/plain" });
     res.end(JSON.stringify({ Error: "Invalid delay" }));
   }
 }
