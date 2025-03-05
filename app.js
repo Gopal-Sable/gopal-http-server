@@ -1,25 +1,38 @@
 const http = require("http");
 const fs = require("fs/promises");
 const uuid = require("crypto");
+const { json } = require("stream/consumers");
 
 const port = 3000;
 
 const server = http.createServer((req, res) => {
-  switch (req.url) {
-    case "/html":
+  let statusRegx = /^\/status\/(\d+)$/;
+  let delayRegx = /^\/delay\/(\d+)$/;
+  console.log("hi");
+
+  switch (true) {
+    case req.url === "/html":
       getHtml(res);
       break;
-    case "/json":
+    case req.url === "/json":
       getJson(res);
       break;
 
-    case "/uuid":
+    case req.url === "/uuid":
       getUuid(res);
       break;
+
+    case statusRegx.test(req.url):
+      printStatus(res, req.url);
+      break;
+
+    case delayRegx.test(req.url):
+      delayRequest(res, req.url);
+      break;
     default:
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.write("<h1>Hello</h1>");
-      res.end();
+      res.writeHead(404, { "Content-Type": "text/html" });
+      res.write("<h1>Page not found</h1>");
+      res.end(req.url);
       break;
   }
 });
@@ -79,4 +92,24 @@ function getUuid(res) {
   res.writeHead(200, { "Content-Type": "application/json" });
   res.write(JSON.stringify({ uuid: uuid.randomUUID() }));
   res.end();
+}
+
+function printStatus(res, url) {
+  let status = url.split("/")[2];
+  if (status >= 100 && status <= 599) {
+    res.writeHead(status);
+  } else {
+    res.writeHead(500);
+    res.write("Invalid status code: ");
+  }
+  res.end(status);
+}
+
+function delayRequest(res, url) {
+  let delay = url.split("/")[2] * 1000;
+  setTimeout(() => {
+    res.writeHead(200);
+
+    res.end(`${delay}`);
+  }, delay);
 }
