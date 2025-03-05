@@ -1,7 +1,6 @@
 const http = require("http");
 const fs = require("fs/promises");
 const { v4: uuidv4 } = require("uuid");
-const { json } = require("stream/consumers");
 
 const port = 3000;
 
