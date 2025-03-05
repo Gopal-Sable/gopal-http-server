@@ -8,8 +8,13 @@ const server = http.createServer((req, res) => {
     case "/html":
       getHtml(res);
       break;
-
+    case "/json":
+      getJson(res);
+      break;
     default:
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write("<h1>Hello</h1>");
+      res.end();
       break;
   }
 });
@@ -35,4 +40,32 @@ function getHtml(res) {
     .finally(() => {
       res.end();
     });
+}
+
+function getJson(res) {
+  let data = {
+    slideshow: {
+      author: "Yours Truly",
+      date: "date of publication",
+      slides: [
+        {
+          title: "Wake up to WonderWidgets!",
+          type: "all",
+        },
+        {
+          items: [
+            "Why <em>WonderWidgets</em> are great",
+            "Who <em>buys</em> WonderWidgets",
+          ],
+          title: "Overview",
+          type: "all",
+        },
+      ],
+      title: "Sample Slide Show",
+    },
+  };
+
+  res.writeHead(200, { "Content-Type": "application/json" });
+  res.write(JSON.stringify(data));
+  res.end();
 }
