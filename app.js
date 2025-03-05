@@ -1,15 +1,17 @@
 const http = require("http");
 const fs = require("fs/promises");
-const uuid = require("crypto");
-const { json } = require("stream/consumers");
+const { v4: uuidv4 } = require("uuid");
 
 const port = 3000;
 
 const server = http.createServer((req, res) => {
   let statusRegx = /^\/status\/(\d+)$/;
   let delayRegx = /^\/delay\/(\d+)$/;
-  console.log("hi");
-
+  if (req.method !== "GET") {
+    res.writeHead(405, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Method Not Allowed" }));
+    return;
+  }
   switch (true) {
     case req.url === "/html":
       getHtml(res);
@@ -90,7 +92,7 @@ function getJson(res) {
 
 function getUuid(res) {
   res.writeHead(200, { "Content-Type": "application/json" });
-  res.write(JSON.stringify({ uuid: uuid.randomUUID() }));
+  res.write(JSON.stringify({ uuid: uuidv4() }));
   res.end();
 }
 
