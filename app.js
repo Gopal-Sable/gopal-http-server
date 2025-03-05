@@ -1,5 +1,6 @@
 const http = require("http");
 const fs = require("fs/promises");
+const uuid = require("crypto");
 
 const port = 3000;
 
@@ -10,6 +11,10 @@ const server = http.createServer((req, res) => {
       break;
     case "/json":
       getJson(res);
+      break;
+
+    case "/uuid":
+      getUuid(res);
       break;
     default:
       res.writeHead(200, { "Content-Type": "text/html" });
@@ -67,5 +72,11 @@ function getJson(res) {
 
   res.writeHead(200, { "Content-Type": "application/json" });
   res.write(JSON.stringify(data));
+  res.end();
+}
+
+function getUuid(res) {
+  res.writeHead(200, { "Content-Type": "application/json" });
+  res.write(JSON.stringify({ uuid: uuid.randomUUID() }));
   res.end();
 }
