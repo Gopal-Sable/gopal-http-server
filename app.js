@@ -54,8 +54,8 @@ function getHtml(res) {
       return res.write(data);
     })
     .catch((err) => {
-      res.writeHead(404);
-      res.write("Page not found");
+      res.writeHead(404, { "Content-Type": "text/html" });
+      res.write("HTML page not found");
     })
     .finally(() => {
       res.end();
@@ -101,21 +101,21 @@ function printStatus(res, status) {
   if (isStatus) {
     res.writeHead(status, { "Content-Type": "text/plain" });
   } else {
-    res.writeHead(500, { "Content-Type": "text/plain" });
+    res.writeHead(400, { "Content-Type": "text/plain" });
     res.write("Invalid status code: ");
   }
-  res.end(status);
+  res.end(JSON.stringify(status));
 }
 
 function delayRequest(res, delay) {
-  if (!isNaN(delay)) {
+  if (!isNaN(delay) && delay > 0) {
     setTimeout(() => {
       res.writeHead(200, { "Content-Type": "text/plain" });
 
       res.end(`${delay}`);
     }, delay * 1000);
   } else {
-    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.writeHead(400, { "Content-Type": "text/plain" });
     res.end(JSON.stringify({ Error: "Invalid delay" }));
   }
 }
